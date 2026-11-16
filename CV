@@ -1,0 +1,124 @@
+import cv2
+
+# 1. Membaca gambar
+image = cv2.imread('image.png')
+
+# Cek apakah gambar berhasil dibaca
+if image is None:
+    print("Error: Gambar 'image.png' tidak ditemukan!")
+    exit()
+
+# 2. Menampilkan gambar
+cv2.imshow('Image', image)
+cv2.waitKey(0)
+
+# Menampilkan info gambar
+print("Tinggi:", str(image.shape[0]))
+print("Lebar:", str(image.shape[1]))
+print("Jumlah channel:", str(image.shape[2]))
+
+# 3. Mengubah ke Hitam Putih
+gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+cv2.imshow('Grayscale', gray_image)
+cv2.waitKey(0)
+
+print("\n=== Gambar Hitam Putih ===")
+print("Tinggi:", str(gray_image.shape[0]))
+print("Lebar:", str(gray_image.shape[1]))
+print("Jumlah channel:", str(gray_image.shape))
+
+# 4. Menyimpan gambar
+cv2.imwrite('image_gray.jpg', gray_image)
+print("\nGambar telah disimpan sebagai 'image_gray.jpg'")
+
+
+# Ukuran A4 @300 DPI
+image = cv2.imread('image.png')
+
+new_width = 2480
+new_height = 3508
+
+resized_image = cv2.resize(image, (new_width, new_height))
+
+cv2.imwrite('a4_image.jpg', resized_image)
+print(f"Gambar diubah ke ukuran A4: {new_width} × {new_height} piksel")
+
+
+# Deteksi wajah
+# 1. Muat gambar
+image = cv2.imread('image.png')
+# Buat salinan supaya gambar asli tidak berubah
+output = image.copy()
+
+# 2. Muat model deteksi wajah bawaan OpenCV
+face_cascade = cv2.CascadeClassifier(
+    cv2.data.haarcascades + 'haarcascade_frontalface_default.xml'
+)
+
+# 3. Ubah ke skala abu-abu (deteksi lebih akurat)
+gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+# 4. Deteksi semua wajah
+faces = face_cascade.detectMultiScale(
+    gray,
+    scaleFactor=1.1,
+    minNeighbors=5,
+    minSize=(30, 30)
+)
+
+print(f"Ditemukan {len(faces)} wajah")
+
+# 5. Gambar kotak di SETIAP wajah yang ditemukan
+for (x, y, width, height) in faces:
+    cv2.rectangle(
+        output,
+        (x, y),
+        (x + width, y + height),
+        (0, 0, 255),
+        2
+    )
+
+# 6. Tampilkan hasil
+cv2.imshow('Wajah Terdeteksi', output)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
+# Simpan hasilnya
+cv2.imwrite('wajah_terdeteksi.jpg', output)
+print("Hasil disimpan sebagai 'wajah_terdeteksi.jpg'")
+
+
+# Crop Image
+# Baca gambar
+image = cv2.imread('image.png')
+output = image.copy()
+
+# Muat pendeteksi wajah
+face_cascade = cv2.CascadeClassifier(
+    cv2.data.haarcascades + 'haarcascade_frontalface_default.xml'
+)
+
+gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+faces = face_cascade.detectMultiScale(gray, 1.1, 5, minSize=(30, 30))
+
+print(f"Ditemukan {len(faces)} wajah")
+
+# Loop untuk setiap wajah yang ditemukan
+for idx, (x, y, w, h) in enumerate(faces):
+    # Gambar kotak merah di wajah
+    cv2.rectangle(output, (x, y), (x+w, y+h), (0, 0, 255), 2)
+    
+    # Potong bagian wajah — urutan: [atas:bawah, kiri:kanan]
+    crop_image = image[y : y + h, x : x + w]
+    
+    # Tampilkan wajah yang dipotong
+    cv2.imshow(f'Wajah {idx+1}', crop_image)
+    
+    # Simpan hasil potongan
+    cv2.imwrite(f'wajah_{idx+1}.jpg', crop_image)
+    print(f"Wajah {idx+1} disimpan ✅")
+
+# Tampilkan gambar lengkap dengan kotak
+cv2.imshow('Semua Wajah', output)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
